@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CipherBrick Pro - Your Message. Your Lock.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #111111;
+      --bg-card:    #191919;
+      --bg-raised:  #222222;
+      --border:     #2a2a2a;
+      --border-mid: #333;
+      --gold:       #c4b428;
+      --green:      #00c851;
+      --red:        #ff4f4f;
+      --text:       #e0e0e0;
+      --text-mid:   #888;
+      --text-dim:   #444;
+      --mono:       'Share Tech Mono', monospace;
+      --sans:       'DM Sans', sans-serif;
+      --display:    'Bebas Neue', sans-serif;
+      --r:          8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5vw;
+      background: rgba(17,17,17,0.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--gold);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .logo-box {
+      width: 28px; height: 28px;
+      background: var(--gold);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--green) !important;
+      color: #000 !important;
+      font-weight: 700 !important;
+      padding: 0.45rem 1.2rem;
+      border-radius: 4px;
+      transition: opacity 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    @media (max-width: 700px) { .nav-links { display: none; } }
+
+    /* ══ SHARED ══ */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 5vw; }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    h2.sh {
+      font-family: var(--display);
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      color: #fff;
+      line-height: 1.05;
+      margin-bottom: 0.75rem;
+    }
+
+    h2.sh .g { color: var(--gold); }
+
+    .sub {
+      font-size: 0.95rem;
+      color: var(--text-mid);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 46ch;
+      margin-bottom: 2.5rem;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ HERO - Job: Hook ══ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 5vw 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      gap: 3rem;
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 40%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(196,180,40,0.055) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-mid);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: rise 0.5s ease forwards 0.1s;
+    }
+
+    .pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 7px var(--green);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(4rem, 12vw, 8.5rem);
+      line-height: 0.92;
+      letter-spacing: 0.015em;
+      color: #fff;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: rise 0.6s ease forwards 0.25s;
+    }
+
+    .hero h1 .g { color: var(--gold); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--text-mid);
+      font-weight: 300;
+      line-height: 1.75;
+      max-width: 38ch;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: rise 0.6s ease forwards 0.4s;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 4.5rem;
+      opacity: 0;
+      animation: rise 0.6s ease forwards 0.55s;
+    }
+
+    .btn-g {
+      background: var(--green);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.85rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-g:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-o {
+      border: 1px solid var(--border-mid);
+      color: var(--text-mid);
+      font-size: 0.95rem;
+      padding: 0.85rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .btn-o:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+
+    /* ── Hero Visual ── */
+    .hero-visual {
+      opacity: 0;
+      animation: rise 0.7s ease forwards 0.65s;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .hero-browser {
+      background: var(--bg-card);
+      border: 1px solid var(--border-mid);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,180,40,0.08);
+    }
+
+    .browser-bar {
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .browser-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--border-mid);
+      display: inline-block;
+    }
+
+    .hero-browser video {
+      display: block;
+      width: 100%;
+    }
+
+    /* ══ STAT BAR - Job: Instant credibility ══ */
+    .stat-bar {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+    }
+
+    .stat-item {
+      flex: 1;
+      max-width: 220px;
+      text-align: center;
+      padding: 2rem 1rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: var(--display);
+      font-size: 2.8rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-mid);
+      font-weight: 300;
+    }
+
+    /* ══ CONCEPT - Job: Explain the difference visually ══ */
+    .concept { padding: 6rem 5vw; }
+
+    .concept-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .cc {
+      background: var(--bg-card);
+      padding: 2.5rem;
+      position: relative;
+    }
+
+    .cc::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .cc.bad::after  { background: var(--red); }
+    .cc.good::after { background: var(--green); }
+
+    /* journey illustration inside card */
+    .journey {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.75rem;
+      padding: 1.25rem;
+      background: var(--bg-raised);
+      border-radius: var(--r);
+      border: 1px solid var(--border-mid);
+    }
+
+    .j-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .j-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--border-mid);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .j-icon.red  { border-color: var(--red);   background: rgba(255,79,79,0.08); }
+    .j-icon.grn  { border-color: var(--green);  background: rgba(0,200,81,0.08); }
+    .j-icon.gld  { border-color: var(--gold);   background: rgba(196,180,40,0.08); }
+
+    .j-label {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+
+    .j-pipe {
+      flex: 1;
+      margin: 0 0.5rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .j-pipe-line {
+      height: 2px;
+      width: 100%;
+    }
+
+    .j-pipe-line.locked { background: var(--green); }
+    .j-pipe-line.open   { background: var(--border-mid); }
+    .j-pipe-line.gold   { background: linear-gradient(to right, var(--gold), var(--green)); }
+
+    .j-pipe-tag {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 0.48rem;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+    }
+
+    .j-pipe-tag.g { color: var(--green); }
+    .j-pipe-tag.r { color: var(--red); }
+    .j-pipe-tag.au { color: var(--gold); }
+
+    .cc h3 {
+      font-family: var(--display);
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+
+    .cc p {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+      line-height: 1.7;
+      font-weight: 300;
+      max-width: 36ch;
+    }
+
+    .verdict {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+    }
+
+    .verdict.bad  { background: rgba(255,79,79,0.1);  color: var(--red);   border: 1px solid rgba(255,79,79,0.2); }
+    .verdict.good { background: rgba(0,200,81,0.1);   color: var(--green); border: 1px solid rgba(0,200,81,0.2); }
+
+    /* ══ HOW IT WORKS - Job: Show the process ══ */
+    .hiw { padding: 6rem 5vw; background: var(--bg-card); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-top: 2.5rem;
+    }
+
+    .step {
+      background: var(--bg-raised);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .step-num {
+      font-family: var(--display);
+      font-size: 3.5rem;
+      color: var(--border-mid);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-icon { font-size: 1.8rem; display: block; margin-bottom: 0.5rem; }
+
+    .step h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .step p {
+      font-size: 0.78rem;
+      color: var(--text-mid);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    /* ══ FEATURES - Job: List capabilities ══ */
+    .feats { padding: 6rem 5vw; }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .feat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .feat:hover { border-color: rgba(196,180,40,0.3); transform: translateY(-2px); }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--r);
+      background: var(--bg-raised);
+      border: 1px solid var(--border-mid);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .feat h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .feat p {
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ══ USE CASES - Job: Show who it's for ══ */
+    .cases { padding: 6rem 5vw; background: var(--bg-card); }
+
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .case {
+      background: var(--bg-raised);
+      padding: 2rem;
+      transition: background 0.2s;
+    }
+
+    .case:hover { background: #252525; }
+
+    .case-icon { font-size: 1.8rem; margin-bottom: 0.75rem; display: block; }
+
+    .case h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .case p {
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ══ FAQ ══ */
+    .faq { padding: 6rem 5vw; }
+
+    .faq-list {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+    }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 1.4rem 1.75rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.15s;
+    }
+
+    .faq-q:hover { background: var(--bg-raised); }
+
+    .faq-q .faq-chevron {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-q { background: var(--bg-raised); }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--gold); }
+
+    .faq-a {
+      display: none;
+      padding: 0 1.75rem 1.4rem;
+      font-size: 0.83rem;
+      color: var(--text-mid);
+      line-height: 1.7;
+      font-weight: 300;
+      max-width: 72ch;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+
+    /* ══ TRUST STRIP ══ */
+    .trust-strip {
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 5vw;
+    }
+
+    .trust-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .trust-tile {
+      background: var(--bg-card);
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+    }
+
+    .trust-tile .t-icon { font-size: 1.6rem; display: block; margin-bottom: 0.5rem; }
+
+    .trust-tile h5 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .trust-tile p {
+      font-size: 0.75rem;
+      color: var(--text-mid);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    @media (max-width: 700px) {
+      .trust-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ══ WHITEPAPER - Job: Drive white paper downloads ══ */
+    .wp {
+      padding: 4rem 5vw;
+      background: linear-gradient(135deg, #161407 0%, var(--bg) 70%);
+      border-top: 1px solid rgba(196,180,40,0.12);
+      border-bottom: 1px solid rgba(196,180,40,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .wp-left h3 {
+      font-family: var(--display);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .wp-left p {
+      font-size: 0.83rem;
+      color: var(--text-mid);
+      font-weight: 300;
+      max-width: 52ch;
+    }
+
+    .btn-wp {
+      border: 1px solid rgba(196,180,40,0.35);
+      color: var(--gold);
+      padding: 0.75rem 1.75rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-wp:hover { background: rgba(196,180,40,0.08); }
+
+    /* ══ INSTALL - Job: Convert to download ══ */
+    .install { padding: 6rem 5vw; }
+
+    .install-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    .ic {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .ic:hover { border-color: rgba(196,180,40,0.3); transform: translateY(-3px); }
+
+    .ic .icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+
+    .ic h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .ic p {
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .ibtn {
+      display: inline-block;
+      padding: 0.55rem 1.3rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      margin: 0.2rem;
+    }
+
+    .ibtn:hover { opacity: 0.82; }
+    .ibtn.green { background: var(--green); color: #000; }
+    .ibtn.gold  { background: var(--gold);  color: #000; }
+    .ibtn.ghost { border: 1px solid var(--border-mid); color: var(--text-mid); }
+
+    /* ══ FOOTER ══ */
+    footer {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 3rem 5vw 1.5rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .f-brand {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .f-brand-box {
+      width: 20px; height: 20px;
+      background: var(--gold);
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+    }
+
+    .f-tagline {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      font-weight: 300;
+      max-width: 26ch;
+    }
+
+    .f-col h5 {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      margin-bottom: 0.9rem;
+    }
+
+    .f-col ul { list-style: none; }
+    .f-col li + li { margin-top: 0.4rem; }
+
+    .f-col a {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .f-col a:hover { color: var(--gold); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .f-copy {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .trust-row {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tc {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.18rem 0.5rem;
+      border-radius: 3px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ══ HERO TWO-COLUMN (desktop) ══ */
+    @media (min-width: 900px) {
+      .hero { text-align: left; }
+      .hero-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .hero-text {
+        align-items: flex-start;
+        flex: 0 0 44%;
+      }
+      .hero-visual {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+      .hero-actions { justify-content: flex-start; }
+      .hero-sub { max-width: 42ch; }
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .concept-cards { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .feat-grid { grid-template-columns: 1fr; }
+      .cases-grid { grid-template-columns: 1fr 1fr; }
+      .install-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 580px) {
+      .steps { grid-template-columns: 1fr; }
+      .cases-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-box">🔒</div>
+    CIPHERBRICK PRO
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">How It's Different</a></li>
+    <li><a href="#hiw">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+<li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="#install" class="nav-cta">Get the App</a>
+</nav>
+
+
+<!-- ══ HERO - Hook ══ -->
+<section class="hero">
+  <div class="hero-inner">
+
+  <div class="hero-text">
+    <div class="hero-badge"><div class="pulse"></div>AES-256-GCM · Fully Offline · Open Source</div>
+
+    <h1>Your Message.<br><span class="g">Your Lock.</span></h1>
+
+    <p class="hero-sub">
+      Encrypt your content before it leaves your device.
+      Send it anywhere. It stays locked - no matter where it lands.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#install" class="btn-g">Get CipherBrick Free</a>
+      <a href="#concept" class="btn-o">See How It's Different →</a>
+    </div>
+  </div>
+
+  <!-- App preview -->
+  <div class="hero-visual">
+    <div class="hero-browser">
+      <div class="browser-bar">
+        <span class="browser-dot"></span>
+        <span class="browser-dot"></span>
+        <span class="browser-dot"></span>
+      </div>
+      <video id="heroVideo" src="gif/demo-full.mp4" autoplay loop muted playsinline></video>
+    </div>
+  </div>
+
+  </div><!-- /hero-inner -->
+</section>
+
+
+<!-- ══ STAT BAR - Credibility ══ -->
+<div class="stat-bar">
+  <div class="stat-item">
+    <div class="stat-num">256</div>
+    <div class="stat-label">Bit Encryption</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Data Stored or Sent</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">9</div>
+    <div class="stat-label">Languages</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">∞</div>
+    <div class="stat-label">Channels It Works On</div>
+  </div>
+</div>
+
+
+<!-- ══ CONCEPT - Explain the difference ══ -->
+<section class="concept" id="concept">
+  <span class="tag">// What Makes It Different</span>
+  <h2 class="sh">Most encryption protects <span class="g">the journey.</span><br>We protect the destination.</h2>
+
+  <div class="concept-cards">
+
+    <!-- PROBLEM -->
+    <div class="cc bad">
+      <div class="journey">
+        <div class="j-node">
+          <div class="j-icon">📱</div>
+          <div class="j-label">SENDER</div>
+        </div>
+        <div class="j-pipe">
+          <div class="j-pipe-line locked"></div>
+          <span class="j-pipe-tag g">🔒 ENCRYPTED IN TRANSIT</span>
+        </div>
+        <div class="j-node">
+          <div class="j-icon red">👁️</div>
+          <div class="j-label">ARRIVES AS<br>PLAINTEXT</div>
+        </div>
+      </div>
+      <h3>Encrypted in Transit.<br>Exposed on Arrival.</h3>
+      <p>The channel is locked. But the moment your message lands - it's readable. One wrong contact. One unlocked phone. Everything exposed.</p>
+      <span class="verdict bad">⚠ Encryption ends on arrival</span>
+    </div>
+
+    <!-- SOLUTION -->
+    <div class="cc good">
+      <div class="journey">
+        <div class="j-node">
+          <div class="j-icon gld">🔒</div>
+          <div class="j-label">ENCRYPTED<br>CONTENT</div>
+        </div>
+        <div class="j-pipe">
+          <div class="j-pipe-line gold"></div>
+          <span class="j-pipe-tag au">ANY CHANNEL</span>
+        </div>
+        <div class="j-node">
+          <div class="j-icon gld">🔒</div>
+          <div class="j-label">STILL<br>LOCKED</div>
+        </div>
+      </div>
+      <h3>Locked Before It Leaves.<br>Locked When It Arrives.</h3>
+      <p>CipherBrick encrypts the content itself. The channel doesn't matter. The destination doesn't matter. Only the right key opens it.</p>
+      <span class="verdict good">✓ Encryption never expires</span>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ HOW IT WORKS - The process ══ -->
+<section class="hiw" id="hiw">
+  <span class="tag">// How It Works</span>
+  <h2 class="sh">Four Steps. <span class="g">That's It.</span></h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <span class="step-icon">✍️</span>
+      <h4>Write your message</h4>
+      <p>Type anything - a password, a document, sensitive details.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <span class="step-icon">🗝️</span>
+      <h4>Set your key</h4>
+      <p>A secret known only to you and your recipient. Optionally add a physical hardware key.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <span class="step-icon">🔒</span>
+      <h4>Encrypt</h4>
+      <p>One tap. AES-256 runs locally on your device. Nothing leaves.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <span class="step-icon">📤</span>
+      <h4>Send anywhere</h4>
+      <p>Text, email, QR code, audio tone. Your choice. The lock stays on.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FEATURES - Capabilities ══ -->
+<section class="feats" id="features">
+  <span class="tag">// Features</span>
+  <h2 class="sh">Everything You Need. <span class="g">Nothing You Don't.</span></h2>
+
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-icon">🔐</div>
+      <div>
+        <h4>AES-256-GCM Encryption</h4>
+        <p>Military-grade with built-in tamper detection. Used by governments and financial institutions worldwide.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔑</div>
+      <div>
+        <h4>Hardware Key Support</h4>
+        <p>Use a FIDO2 security key as your identity. Only your key can decrypt - no password required.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔄</div>
+      <div>
+        <h4>Secure Key Exchange</h4>
+        <p>Built-in ECDH wizard lets two parties agree on a shared key without ever transmitting it. No pre-shared secret required.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔊</div>
+      <div>
+        <h4>Audio Transmission</h4>
+        <p>Transmit encrypted payloads as audio tones between devices. No internet. No Bluetooth. No trace.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📷</div>
+      <div>
+        <h4>QR Code Payloads</h4>
+        <p>Generate and scan encrypted QR codes. Share visually, air-gap friendly.</p>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">⚡</div>
+      <div>
+        <h4>Fully Offline</h4>
+        <p>All encryption happens locally. Nothing is stored, logged, or transmitted by the app. Ever.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ USE CASES - Who it's for ══ -->
+<section class="cases" id="use-cases">
+  <span class="tag">// Who It's For</span>
+  <h2 class="sh">Built for <span class="g">Real Scenarios</span></h2>
+
+  <div class="cases-grid">
+    <div class="case">
+      <span class="case-icon">👤</span>
+      <h4>Personal Privacy</h4>
+      <p>Share account details or sensitive documents without worrying about who else might see them.</p>
+    </div>
+    <div class="case">
+      <span class="case-icon">🏢</span>
+      <h4>Teams & Businesses</h4>
+      <p>Send credentials and confidential data over the tools you already use - safely.</p>
+    </div>
+    <div class="case">
+      <span class="case-icon">⚕️</span>
+      <h4>Healthcare & Legal</h4>
+      <p>A strong second layer of protection when sharing sensitive client or patient information.</p>
+    </div>
+    <div class="case">
+      <span class="case-icon">📡</span>
+      <h4>Off-Grid & Field Use</h4>
+      <p>When you can't control the channel, encrypt the content before it enters it.</p>
+    </div>
+    <div class="case">
+      <span class="case-icon">🔑</span>
+      <h4>Advanced Security</h4>
+      <p>Add a physical hardware key for two-factor protection at the content level.</p>
+    </div>
+    <div class="case">
+      <span class="case-icon">💻</span>
+      <h4>Developers</h4>
+      <p>Open source, MIT licensed. Audit it, fork it, self-host it.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FAQ ══ -->
+<section class="faq" id="faq">
+  <span class="tag">// Common Questions</span>
+  <h2 class="sh">Straight <span class="g">Answers</span></h2>
+
+  <div class="faq-list">
+
+    <div class="faq-item open">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Is it really offline? How do I know nothing is sent?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        All encryption and decryption runs locally using the Web Crypto API built into your browser. CipherBrick has no backend, no server, and no telemetry. The source is MIT licensed and fully auditable on GitHub - you can verify there are no outbound requests yourself.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Can the recipient decrypt on a different device or browser?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        Yes. The encrypted payload is a self-contained string. Anyone running CipherBrick - on any device, any supported browser - can decrypt it with the correct key and salt. No accounts, no sync, no server handshake.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Do I need to be technical to use it?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        No. The default mode works like any encryption tool: set a key, encrypt, share. There's also a simplified mode that handles the technical details automatically, so you only need to share a single password. Advanced options like hardware key support are there if you need them, but never required.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How do I share my key with the recipient?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        Any method you're comfortable with works. The simplest option for most people is verbally - a phone call or in person. Nothing written, nothing transmitted. You can also send the key through a separate channel from the encrypted message - even if someone sees the message, it's useless without the key.<br><br>
+        If you want a more formal approach, CipherBrick includes a built-in Key Exchange Wizard. It lets both parties arrive at a shared key without ever transmitting it - each person shares only a public key, which is safe to send openly.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What happens if I lose my key?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        There is no recovery. CipherBrick has no servers, no accounts, and no recovery option - your data stays entirely in your control.<br><br>
+        Think of it like a combination you set on a safe yourself. Nobody else ever knew it, so nobody can give it back. Whatever you used to encrypt - a password, a password pair, or a physical security key - keep it somewhere safe. If it's gone, the encrypted content is gone with it.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Is CipherBrick suitable for HIPAA or compliance use?
+        <span class="faq-chevron">▼</span>
+      </button>
+      <div class="faq-a">
+        CipherBrick provides strong AES-256-GCM encryption as an additional layer on top of whatever channel you use. It does not replace a comprehensive compliance program, and we make no specific HIPAA/GDPR compliance claims. Consult your legal and compliance team for your specific regulatory requirements.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ TRUST STRIP ══ -->
+<div class="trust-strip">
+  <div class="trust-inner">
+    <div class="trust-tile">
+      <span class="t-icon">🚫</span>
+      <h5>No Account Required</h5>
+      <p>Open the app and start encrypting. Nothing to sign up for.</p>
+    </div>
+    <div class="trust-tile">
+      <span class="t-icon">📡</span>
+      <h5>No Data Leaves Your Device</h5>
+      <p>No analytics, no crash reporting, no telemetry of any kind.</p>
+    </div>
+    <div class="trust-tile">
+      <span class="t-icon">🔍</span>
+      <h5>Fully Auditable</h5>
+      <p>MIT licensed. Every line of code is public. Read it, fork it, verify it.</p>
+    </div>
+    <div class="trust-tile">
+      <span class="t-icon">📴</span>
+      <h5>Works Without Internet</h5>
+      <p>Installs as a PWA. Runs completely offline after the first load.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ WHITEPAPER - Drive downloads ══ -->
+<div class="wp">
+  <div class="wp-left">
+    <h3>📄 Read the White Paper</h3>
+    <p><em>A Technical White Paper on Browser-Native, Zero-Trust Encrypted Messaging</em> - the full philosophy and technical approach behind CipherBrick.</p>
+  </div>
+  <a href="docs/CipherBrickPro_Whitepaper.pdf" class="btn-wp" target="_blank" rel="noopener">Download PDF →</a>
+</div>
+
+
+<!-- ══ INSTALL - Convert ══ -->
+<section class="install" id="install">
+  <span class="tag">// Get CipherBrick</span>
+  <h2 class="sh">Free on Every <span class="g">Platform</span></h2>
+
+  <div class="install-grid">
+    <div class="ic">
+      <span class="icon">🌐</span>
+      <h4>Web App (PWA)</h4>
+      <p>Install from your browser. Works fully offline after install.</p>
+      <a href="#" class="ibtn green">Launch Web App</a>
+    </div>
+    <div class="ic">
+      <span class="icon">📱</span>
+      <h4>Mobile</h4>
+      <p>Native apps for iOS and Android.</p>
+      <a href="#" class="ibtn gold">App Store</a>
+      <a href="#" class="ibtn gold">Google Play</a>
+    </div>
+    <div class="ic">
+      <span class="icon">🐙</span>
+      <h4>Open Source</h4>
+      <p>Full source on GitHub. MIT licensed. Self-host on any static server.</p>
+      <a href="https://github.com/Cliff3c/Cipherbrick-Pro" target="_blank" rel="noopener" class="ibtn ghost">GitHub →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="f-brand">
+        <div class="f-brand-box">🔒</div>
+        CIPHERBRICK PRO
+      </div>
+      <p class="f-tagline">Encrypt the content. Not just the connection.</p>
+    </div>
+    <div class="f-col">
+      <h5>Product</h5>
+      <ul>
+        <li><a href="#">Web App</a></li>
+        <li><a href="#">iOS</a></li>
+        <li><a href="#">Android</a></li>
+        <li><a href="https://github.com/Cliff3c/Cipherbrick-Pro" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>Learn</h5>
+      <ul>
+        <li><a href="docs/CipherBrickPro_Whitepaper.pdf" target="_blank" rel="noopener">White Paper</a></li>
+        <li><a href="#">Help & Docs</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>Community</h5>
+      <ul>
+        <li><a href="https://github.com/Cliff3c/Cipherbrick-Pro/discussions" target="_blank" rel="noopener">GitHub Discussions</a></li>
+        <li><a href="#">Report a Bug</a></li>
+        <li><a href="#">Contribute</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="f-copy">© 2026 CipherBrick Pro &nbsp;·&nbsp; <a href="privacy.html" style="color:var(--text-dim);text-decoration:none;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Privacy Policy</a> &nbsp;·&nbsp; <a href="terms.html" style="color:var(--text-dim);text-decoration:none;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Terms of Use</a></p>
+    <div class="trust-row">
+      <span class="tc">MIT Licensed</span>
+      <span class="tc">No Ads</span>
+      <span class="tc">No Tracking</span>
+      <span class="tc">No Cloud</span>
+      <span class="tc">Offline First</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    // Open clicked (unless it was already open)
+    if (!isOpen) item.classList.add('open');
+  }
+
+</script>
+
+</body>
+</html>
