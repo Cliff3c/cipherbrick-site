@@ -1,6 +1,10 @@
 ﻿CipherBrick Pro
 A Technical White Paper on Browser-Native, Zero-Trust Encrypted Messaging
 -------------------------
+Cliff Cazes
+cliff@cipherbrick.com | cipherbrick.com
+March 2026
+-------------------------
 ==========
 Abstract
 ==========
