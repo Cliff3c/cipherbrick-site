@@ -21,7 +21,7 @@ Apps like Signal approach secure communication by taking input from the sender i
 
 As I thought about this, I mentally compared it to a VPN tunnel which is essentially the same concept. Data is encrypted while in transit, and once it reaches its destination, it is decrypted and readily available to read. While this is a solid solution for protecting messages in motion, one problem that is easily overlooked is: what happens when the recipient is the unintended target? A misdirected message that is sent to the wrong person by mistake bypasses all of that transport security entirely. Overall, the weakest link isn't "the math," it's the moment a human misclicks. Identifying this as a real problem, I began to brainstorm potential solutions.
 
-What if you were sending sensitive information and accidentally sent it to the wrong recipient? How could you protect that information even if you made that mistake? As I thought through various scenarios, the consequences became clear. Sending financial details, account credentials, or personal identifying information to the wrong recipient could result in compromised accounts, identity theft, or stolen finances. In a business context, a misdirected message containing confidential information could have catastrophic consequences. Compromised devices add yet another dimension to the problem — information sent in confidence could be captured via a screenshot the moment it arrives. End-to-end encryption, as robust as it is, simply does not address these scenarios.
+What if you were sending sensitive information and accidentally sent it to the wrong recipient? How could you protect that information even if you made that mistake? As I thought through various scenarios, the consequences became clear. Sending financial details, account credentials, or personal identifying information to the wrong recipient could result in compromised accounts, identity theft, or stolen finances. In a business context, a misdirected message containing confidential information could have catastrophic consequences. Compromised devices add yet another dimension to the problem: information sent in confidence could be captured via a screenshot the moment it arrives. End-to-end encryption, as robust as it is, simply does not address these scenarios.
 
 So, with this in mind, I began contemplating other ways to achieve secure communications, which got me thinking about past novels I had read and shows I had seen. Rather than establishing a secure connection between two or more parties, what if you took the approach of encrypting the message itself before sending, bypassing the need for a secure transport layer entirely? It brought me back to reading Dan Brown's Digital Fortress as a teenager, in which ciphers and encoding techniques were used to protect messages. I had been fascinated by that and had even written a simple ASCII replacement script in C++ to experiment with basic message encryption at the time. More recently, shows like Death and Other Details have referenced similar techniques: ciphers and character substitution schemes used to protect sensitive notes. Along those same lines, I began thinking that a different approach, not necessarily better but fundamentally different, would be to encrypt the message before sending and then become completely agnostic about the transport layer. The message could be sent via text, a modern chat platform, or even published in a magazine, it would not matter, because only the intended recipient with the correct key could ever read it. End-to-end encryption is most valuable for live, real-time transmissions; for static messages, encrypting the content itself is a more resilient model. With that line of thinking, I began prototyping a solution using audited, browser-native cryptographic primitives, which eventually led to the development of CipherBrick Pro: a tool built on the premise that true message security begins before the send button is ever pressed.
 
@@ -43,7 +43,7 @@ CipherBrick Pro is "minimum retention" by design. No encryption key or salt is w
 
 CipherBrick Pro is "real-world usable," not crypto-theory cosplay. Strong encryption is only useful if people can actually use it. Since the application does not store anything, the responsibility of managing keys and passphrases falls on the user. Parties can exchange credentials through any method they trust, but for scenarios where doing so openly could be compromising, an integrated key exchange wizard helps two people arrive at matching credentials without saying them out loud or typing them into the same channel they are trying to secure. The app supports multiple out-of-band transfer methods (QR code and audio transmission) so that bootstrapping a private conversation is practical even in situations where a secondary secure channel is not available.
 
-CipherBrick Pro is local-first by default. All encryption, decryption, key generation, and key exchange operations are performed on the user's device. No network requests are made during normal operation, which reduces the attack surface for anyone attempting to intercept communications. The application can be self-hosted on a web server and is installable on mobile devices as a Progressive Web App (PWA); a native mobile release for major platforms is also planned. Once installed, the app requires no network access whatsoever. By design, message encryption is never processed through any external system. Your data stays on your device.
+CipherBrick Pro is local-first by default. All encryption, decryption, key generation, and key exchange operations are performed on the user's device. No network requests are made during normal operation, which reduces the attack surface for anyone attempting to intercept communications. The application can be self-hosted on a web server, is installable on any platform as a Progressive Web App (PWA), and is available on Android via Google Play. Once installed, the app requires no network access whatsoever. By design, message encryption is never processed through any external system. Your data stays on your device.
 
 ---
 
@@ -78,6 +78,8 @@ HKPM (Hardware Key Personal Message) mode represents a fundamentally different m
 This key pair is what enables HKPM's one-to-one messaging model. Before exchanging encrypted messages, both parties share their public keys with each other, which CipherBrick facilitates through its key exchange flow. When encrypting, the sender uses the recipient's public key along with their own private key to derive a shared secret via ECDH (Elliptic Curve Diffie-Hellman). The sender's public key is embedded directly in the encrypted payload so the recipient can complete the same derivation in reverse, without any prior setup on the receiving end beyond possessing their own hardware key.
 
 The result is a self-contained payload: anyone can receive it, but only the holder of the correct hardware key can decrypt it. This is the most secure mode CipherBrick offers. A message encrypted for a specific recipient can only be decrypted by that recipient. Not by anyone intercepting the payload, and not even by the sender, because while decryption requires both a hardware key and the other party's public key, the recipient's public key is used during encryption but is never written into the payload. Even with their own hardware key in hand, the sender cannot reverse the encryption from the payload string alone. When the recipient replies, the app pre-fills the sender's public key extracted from the original payload. The reply is encrypted the same way in reverse, and the original sender decrypts it simply by presenting their hardware key. HKPM is compatible with both dedicated hardware security keys and mobile platform authenticators (such as passkeys backed by Touch ID or Face ID), as long as the device supports the FIDO2 PRF extension.
+
+One important consideration for HKPM users concerns deployment context. A hardware key credential is cryptographically bound to the relying party identifier (rpId), the hostname of the deployment from which it was registered. This means a credential registered at `app.cipherbrick.com` produces a different key pair than one registered at a self-hosted instance at a different domain, even with the same physical hardware key. Switching deployment contexts creates a new HKPM identity: any messages previously encrypted to the old public key can only be decrypted by accessing the original deployment context. This is a deliberate security property, not a limitation: a credential registered on one deployment cannot be impersonated or replicated on another. Users who require maximum deployment independence should register their hardware key on whichever instance they intend to use long-term, or accept that migration between deployments constitutes a change of cryptographic identity.
 
 Across all modes, CipherBrick does not store, transmit, or recover encryption keys. In Standard and Simple modes, security depends on the strength and secrecy of the user's chosen Key, as well as disciplined handling practices, particularly the separation of the Key from the encrypted message during transmission. In HKPM mode, security depends on maintaining control over the hardware or external key source, as loss of that control may result in permanent loss of access to encrypted data.
 
@@ -163,11 +165,29 @@ That distinction has a direct security consequence: there is nothing to breach. 
 
 The session model is intentionally aggressive. By default, five minutes of inactivity clears all sensitive fields, wipes sessionStorage, and attempts to clear the system clipboard, reducing the window in which a lost or unattended device exposes anything useful. The clipboard is also independently cleared 30 seconds after a copy operation, addressing the very human habit of copying a sensitive value and forgetting it exists. This is the right kind of paranoia: not theatrical, but practical. It acknowledges that modern threats include not only active attackers but also lost devices, shoulder-surfing, and inattention.
 
-CipherBrick Pro is installable as a Progressive Web App (PWA) and works fully offline after installation, with no background sync, no analytics, and no network calls of any kind once loaded.
+CipherBrick Pro is installable as a Progressive Web App (PWA) on any platform and works fully offline after the initial load, with no background sync, no analytics, and no network calls of any kind once the service worker cache is populated. The Android Google Play release operates identically after a one-time OS-level domain association check on first launch. See Section 9 for a full comparison of deployment models.
 
 ---
 
-## 9. Conclusion
+## 9. Deployment Models
+
+CipherBrick Pro is designed to be deployed and used in several distinct ways, each with different tradeoffs between convenience and independence. All deployment models use identical cryptographic logic; payloads produced in any context are fully interoperable with any other.
+
+### Browser / PWA
+
+The simplest path. Navigate to `app.cipherbrick.com` in any modern browser. On the first visit, the service worker downloads and caches the entire application. All subsequent sessions run from that local cache with no network access required, including in air-gapped environments. On Android and iOS, the app can be installed to the home screen as a PWA through the browser's native install prompt, providing an app-like experience with no app store required. This deployment model is free, requires no account, and has no ongoing dependencies beyond the initial cache population.
+
+### Android App (Google Play)
+
+The Android app is a Trusted Web Activity (TWA), a thin native shell that opens the application inside the device's installed Chrome browser. This means the app runs the identical codebase as the browser version, in the same Chrome engine that powers WebAuthn and the PRF extension. On first launch, Android performs a one-time OS-level verification that the app is associated with its hosting domain; this is a system process and not an action initiated by the application itself. After that verification, the app runs identically to the PWA version: fully offline, no network calls, air-gap capable. The Play Store listing exists as a distribution convenience; the underlying application is the same.
+
+### Self-Hosted
+
+For users who require absolute independence from any external infrastructure, CipherBrick Pro is fully open source (MIT licensed) and self-hostable on any static web server. A self-hosted instance has zero external dependencies from day one: no app store, no CDN, no domain association check of any kind. The only infrastructure requirement for full functionality, including HKPM hardware key support, is that the server presents a valid TLS certificate, as browsers require a secure context (HTTPS) to expose the WebAuthn API. Locally-served instances on `localhost` are an exception: browsers treat localhost as a secure context without TLS, making it suitable for single-device use or development without a certificate. Self-hosted instances are fully interoperable with the official deployment: a message encrypted on a self-hosted instance can be decrypted at `app.cipherbrick.com` and vice versa, provided the same credentials are used. The only exception is HKPM, where key identity is bound to the hostname of the deployment (see Section 4).
+
+---
+
+## 10. Conclusion
 
 CipherBrick Pro is designed to provide strong, standards-based encryption in a form that is portable, flexible, and independent of any specific platform or service. By leveraging AES-256-GCM for authenticated encryption and well-established key derivation practices, it ensures that messages remain confidential and tamper-evident when handled correctly.
 
@@ -189,29 +209,29 @@ https://www.theguardian.com/technology/2026/mar/18/instagram-to-remove-end-to-en
 [2] "Advanced Data Protection for iCloud," Apple Support (UK).
 https://support.apple.com/en-gb/122234
 
-[3] European Parliament Press Release, March 6, 2026 — Extension of voluntary detection derogation.
+[3] European Parliament Press Release, March 6, 2026. Extension of voluntary detection derogation.
 https://www.europarl.europa.eu/pdfs/news/expert/2026/3/press_release/20260306IPR37531/20260306IPR37531_en.pdf
 
 [4] "Why Client-Side Scanning Is a Lose-Lose Proposition," Access Now.
 https://www.accessnow.org/why-client-side-scanning-is-lose-lose-proposition/
 
-[5] NIST SP 800-38D — Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC.
+[5] NIST SP 800-38D. Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC.
 https://csrc.nist.gov/pubs/sp/800/38/d/final
 
-[6] NIST SP 800-132 — Recommendation for Password-Based Key Derivation.
+[6] NIST SP 800-132. Recommendation for Password-Based Key Derivation.
 https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf
 
 [7] W3C Web Cryptography API, Level 2.
 https://www.w3.org/TR/webcrypto-2/
 
-[8] ggwave — Data-over-Sound Library (ggerganov).
+[8] ggwave. Data-over-Sound Library (ggerganov).
 https://github.com/ggerganov/ggwave
 
-[9] NIST SP 800-56A Rev. 3 — Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography.
+[9] NIST SP 800-56A Rev. 3. Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography.
 https://csrc.nist.gov/pubs/sp/800/56/a/r3/final
 
-[10] W3C Web Authentication Level 3 — Web Authentication: An API for accessing Public Key Credentials.
+[10] W3C Web Authentication Level 3. Web Authentication: An API for accessing Public Key Credentials.
 https://www.w3.org/TR/webauthn-3/
 
-[11] Yubico Developer Docs — WebAuthn PRF Extension.
+[11] Yubico Developer Docs. WebAuthn PRF Extension.
 https://developers.yubico.com/WebAuthn/Concepts/PRF_Extension/index.html
