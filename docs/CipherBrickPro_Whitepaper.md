@@ -3,7 +3,7 @@
 
 **Cliff Cazes**
 cliff@cipherbrick.com | cipherbrick.com
-Version 1.0 | March 2026
+Version 1.1 | June 2026
 
 ---
 
@@ -68,6 +68,8 @@ CipherBrick Pro supports multiple methods for generating the encryption key used
 In Standard mode, the user provides both a Key and a Salt. These inputs are combined using a password-based key derivation function (PBKDF2) to produce a 256-bit encryption key. The inclusion of a Salt ensures that identical Keys do not produce identical outputs, while the derivation process increases the computational cost of guessing attacks. This approach aligns with established guidance for password-based cryptography [6].
 
 Simple mode follows the same PBKDF2 derivation path, but rather than requiring the user to provide a Salt, the app generates a random one automatically at the time of encryption. The recipient does not need to know or enter the Salt separately, because it travels with the payload. This reduces the number of things a user has to manage and share, making the mode more accessible while still preserving the cryptographic benefit of a unique Salt per message.
+
+In both 'Standard' and 'Simple' modes, CipherBrick Pro uses PBKDF2-SHA256 with 100,000 iterations. This is a deliberate parameter choice. Iteration count meaningfully affects security only for keys of marginal entropy: a high-entropy key is computationally infeasible to brute-force at any iteration count, while raising the count from 100,000 to 600,000 adds less than three bits of effective security against guessing attacks. Consistent with the threat model in Section 5, CipherBrick places responsibility for key strength on the user and enforces that posture in the interface through a pattern-aware strength meter and an explicit confirmation step before encrypting with a weak key. The current setting also keeps encryption responsive on low-end mobile hardware. A future format revision may raise this parameter; backward compatibility for existing ciphertexts would be preserved through payload versioning.
 
 Rather than simply appending the Salt to the beginning or end of the ciphertext, where it would be trivially identifiable to anyone inspecting the output, CipherBrick weaves the Salt character-by-character throughout the base64-encoded ciphertext string using a fixed interleaving pattern. The result is a single string that looks uniform from the outside, with no obvious markers indicating where the Salt begins or ends. On decryption, the app applies the same pattern in reverse to extract the Salt and reconstruct the clean ciphertext before proceeding. This provides a layer of obfuscation that makes casual inspection or manual extraction of the Salt significantly harder, without adding complexity for the user.
 
@@ -143,7 +145,7 @@ For audio transmission, effectiveness is affected by distance between devices, b
 
 Secure communication with CipherBrick Pro begins before the first message is sent. In Standard mode, both parties must agree on a shared key and salt, and ideally that exchange happens through a different channel than the one being secured. In practice, however, a separate secure channel is not always available. The Key Exchange Wizard solves this bootstrapping problem: it allows two parties to arrive at matching credentials over the same channel they plan to use, without ever transmitting those credentials in plain text.
 
-The wizard uses ECDH (Elliptic Curve Diffie-Hellman) to let two parties derive a shared key and salt independently. Each party generates an ephemeral key pair and exchanges only their public key. Through the mathematical properties of ECDH, both sides arrive at the same shared secret without either party ever sending it directly. That shared secret is then used to deterministically derive the Key and Salt used for AES-256-GCM encryption. NIST SP 800-56A describes approved key-establishment schemes using discrete logarithm cryptography, including elliptic-curve-based Diffie-Hellman variants [9].
+The wizard uses ECDH (Elliptic Curve Diffie-Hellman) to let two parties derive a shared key and salt independently. Each party generates an ephemeral key pair and exchanges only their public key. Through the mathematical properties of ECDH, both sides arrive at the same shared secret without either party ever sending it directly. That shared secret generates a random key and salt, and then encrypts them under the shared secret. It then transmits them in the share string used for AES-256-GCM encryption. NIST SP 800-56A describes approved key-establishment schemes using discrete logarithm cryptography, including elliptic-curve-based Diffie-Hellman variants [9].
 
 The wizard is explicit about operational security: generated key pairs can be downloaded for reuse, but the downloaded file contains the private key and must be protected accordingly, since possession of that file enables impersonation during the key exchange. Once both parties have successfully agreed on a key and salt, the key pair used for the exchange is no longer needed. Ideally, both parties would delete their key pairs once it is confirmed that they both have the key and salt.
 
@@ -157,7 +159,7 @@ CipherBrick Pro also supports HKKE (Hardware Key Key Exchange) mode, an alternat
 
 CipherBrick Pro documents exactly what it stores and what it never stores.
 
-**Stored:** user preferences (timer values, language, mode selection, audio protocol) and hardware key state (credential ID and PRF capability flag) in localStorage; key-exchange wizard session keys in sessionStorage (cleared on tab close, session timeout, or one-hour expiry).
+**Stored:** user preferences (timer values, language, mode selection, audio protocol) and hardware key state (credential ID and PRF capability flag) in localStorage; key-exchange wizard session keys in sessionStorage (cleared on tab close, session timeout, one-hour expiry, idle timeout, or an explicit session clear).
 
 **Never stored:** encryption key and salt, plaintext messages, decrypted output, or hardware-key private material (which is non-extractable by design).
 
