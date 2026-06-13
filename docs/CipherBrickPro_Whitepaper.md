@@ -129,7 +129,7 @@ Recognizing that the ciphertext is long and impractical to transcribe manually, 
 
 ### Audio Transmission
 
-Audio transmission is a distinctive feature that uses the ggwave library [8] to convert a text string into audio tones that can be received by a recipient's microphone and decoded. This requires both parties to be within reasonable proximity of each other for the sound to transmit and be received clearly. If the audio is successfully decoded, the encrypted string field on the Decrypt tab is populated automatically and the user can proceed from there. The ggwave repository is an open-source library that enables communication of small amounts of data between air-gapped devices using sound, without requiring any network connection between them.
+Audio transmission is a distinctive feature that uses the ggwave library [8] to convert a text string into audio tones that can be received by a recipient's microphone and decoded. This requires both parties to be within reasonable proximity of each other for the sound to transmit and be received clearly. If the audio is successfully decoded, the encrypted string field on the Decrypt tab is populated automatically and the user can proceed from there. The ggwave repository is an open-source library that enables communication of small amounts of data between air-gapped devices using sound, without requiring any network connection between them. Audio transport does not add its own integrity layer; corruption or tampering introduced during transmission is caught by AES-GCM's authentication tag, which causes decryption to fail entirely rather than produce altered output.
 
 ### Limitations
 
@@ -147,7 +147,7 @@ Secure communication with CipherBrick Pro begins before the first message is sen
 
 The wizard uses ECDH (Elliptic Curve Diffie-Hellman) to let two parties derive a shared key and salt independently. Each party generates an ephemeral key pair and exchanges only their public key. Through the mathematical properties of ECDH, both sides arrive at the same shared secret without either party ever sending it directly. A random key and salt are generated independently, then encrypted under that shared secret and transmitted in the share string for use with AES-256-GCM encryption. NIST SP 800-56A describes approved key-establishment schemes using discrete logarithm cryptography, including elliptic-curve-based Diffie-Hellman variants [9].
 
-The wizard is explicit about operational security: generated key pairs can be downloaded for reuse, but the downloaded file contains the private key and must be protected accordingly, since possession of that file enables impersonation during the key exchange. Once both parties have successfully agreed on a key and salt, the key pair used for the exchange is no longer needed. Ideally, both parties would delete their key pairs once it is confirmed that they both have the key and salt.
+The wizard is explicit about operational security: generated key pairs can be downloaded for reuse, but the downloaded file contains the private key and must be protected accordingly, since possession of that file enables impersonation during the key exchange. Once both parties have successfully agreed on a key and salt, the key pair used for the exchange is no longer needed. Ideally, both parties would delete their key pairs once it is confirmed that they both have the key and salt. To guard against active interception during the exchange, the wizard displays a 16-character SHA-256 fingerprint for each public key; parties who verify these fingerprints through a separate trusted channel, such as a voice call, can confirm no third party has substituted keys in transit.
 
 Enabling users to save and import key files means the exchange does not need to happen in real time. Regardless of the channel used, as long as each person safely manages their private key, both parties can obtain the agreed-upon key and salt at their convenience, whether they are the sender or the recipient. From that point forward, they can use Standard mode directly with the shared credentials.
 
@@ -159,7 +159,7 @@ CipherBrick Pro also supports HKKE (Hardware Key Key Exchange) mode, an alternat
 
 CipherBrick Pro documents exactly what it stores and what it never stores.
 
-**Stored:** user preferences (timer values, language, mode selection, audio protocol) and hardware key state (credential ID and PRF capability flag) in localStorage; key-exchange wizard session keys in sessionStorage (cleared on tab close, session timeout, one-hour expiry, idle timeout, or an explicit session clear).
+**Stored:** user preferences (timer values, language, mode selection, audio protocol) and hardware key state (credential ID, PRF capability flag, and authenticator attachment preference) in localStorage; key-exchange wizard session keys in sessionStorage (cleared on tab close, session timeout, one-hour expiry, idle timeout, or an explicit session clear).
 
 **Never stored:** encryption key and salt, plaintext messages, decrypted output, or hardware-key private material (which is non-extractable by design).
 
