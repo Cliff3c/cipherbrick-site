@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Terms of Use — CipherBrick Pro</title>
+  <title>Support — CipherBrick Pro</title>
+  <meta name="description" content="Get help with CipherBrick Pro. Contact support, report a bug, or find answers to common questions."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
   <style>
@@ -56,7 +57,7 @@
     .nav-logo {
       font-family: var(--mono);
       font-size: 1rem;
-      color: var(--gold);
+      color: #ffffff;
       text-decoration: none;
       display: flex;
       align-items: center;
@@ -66,11 +67,11 @@
 
     .logo-box {
       width: 28px; height: 28px;
-      background: var(--gold);
       border-radius: 4px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
+      overflow: hidden;
     }
+    .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 
     .nav-links {
       display: flex;
@@ -130,10 +131,9 @@
 
     h1 .g { color: var(--gold); }
 
-    .updated {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      font-family: var(--mono);
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-mid);
       margin-top: 0.5rem;
     }
 
@@ -205,12 +205,46 @@
       line-height: 1.6;
     }
 
+    .warning-box {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-mid);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
     a.contact-link {
       color: var(--gold);
       text-decoration: none;
     }
 
     a.contact-link:hover { text-decoration: underline; }
+
+    .btn-contact {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.4rem;
+      background: transparent;
+      border: 1px solid var(--green);
+      border-radius: var(--r);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-contact:hover {
+      background: var(--green);
+      color: #000;
+    }
 
     /* ══ FOOTER ══ */
     footer {
@@ -224,6 +258,13 @@
       color: var(--text-dim);
       font-family: var(--mono);
     }
+
+    .f-copy a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .f-copy a:hover { color: var(--text); }
 
     .trust-row {
       display: flex;
@@ -248,7 +289,7 @@
 
 <nav>
   <a class="nav-logo" href="index.html">
-    <div class="logo-box">🔒</div>
+    <div class="logo-box"><img src="img/logo.png" alt="CipherBrick Pro"></div>
     CIPHERBRICK PRO
   </a>
   <ul class="nav-links">
@@ -261,68 +302,78 @@
 </nav>
 
 <div class="page-header">
-  <span class="tag">Legal</span>
-  <h1>Terms of <span class="g">Use</span></h1>
-  <p class="updated">Effective date: March 20, 2026</p>
+  <span class="tag">Help &amp; Support</span>
+  <h1>Support <span class="g">Center</span></h1>
+  <p class="subtitle">CipherBrick Pro is a solo-developed project. Response times reflect that — but every message is read.</p>
 </div>
 
 <div class="content">
 
   <div class="section">
-    <h2>Acceptance</h2>
-    <p>By using CipherBrick Pro — whether via the web app, iOS app, or Android app — you agree to these terms. If you do not agree, do not use the app.</p>
-  </div>
-
-  <div class="section">
-    <h2>What CipherBrick Pro Is</h2>
+    <h2>Before You Write</h2>
+    <p>Most questions are answered in the built-in help documentation. If you are using the web app or Android app, tap the <strong style="color:var(--text)">?</strong> icon or go to <strong style="color:var(--text)">Settings → Help &amp; Documentation</strong>.</p>
     <div class="highlight-box">
-      A local encryption tool. No accounts. No servers. No data collection.
+      Quick answers to the most common questions:
     </div>
-    <p>CipherBrick Pro is a client-side encryption utility. All cryptographic operations occur on your device. The app does not transmit, store, or have access to your messages, keys, or any data you process with it.</p>
-  </div>
-
-  <div class="section">
-    <h2>Acceptable Use</h2>
-    <p>You agree to use CipherBrick Pro only for lawful purposes. You may not use the app to:</p>
     <ul>
-      <li>Facilitate illegal activity of any kind</li>
-      <li>Violate the rights of any third party</li>
-      <li>Circumvent laws applicable to you in your jurisdiction</li>
+      <li><strong style="color:var(--text)">Forgot your key or salt?</strong> There is no recovery. Keys and salts are never sent to a server — only you have them.</li>
+      <li><strong style="color:var(--text)">Can't decrypt a message?</strong> The key, salt, and mode (Standard vs Simple) must match exactly what was used to encrypt.</li>
+      <li><strong style="color:var(--text)">Audio not working?</strong> Bring devices within 1 meter, reduce background noise, and switch to Normal protocol in Settings → Audio.</li>
+      <li><strong style="color:var(--text)">HKPM requires Chrome or Edge.</strong> Firefox does not support the WebAuthn PRF extension used by hardware key mode.</li>
+      <li><strong style="color:var(--text)">App works offline.</strong> After the first load, no internet connection is required for any feature.</li>
     </ul>
-    <p>You are solely responsible for the content you encrypt or decrypt using this app and for ensuring your use complies with applicable laws.</p>
   </div>
 
   <div class="section">
-    <h2>No Warranty</h2>
-    <p>CipherBrick Pro is provided <strong style="color:var(--text)">"as is"</strong> without warranty of any kind, express or implied. We make no guarantees regarding the app's fitness for any particular purpose, uninterrupted availability, or freedom from errors.</p>
-    <p>Cryptographic security depends on correct usage, secure devices, and the continued integrity of underlying platform APIs. We cannot guarantee security outcomes in all environments or threat models.</p>
+    <h2>Contact Support</h2>
+    <p>For questions, feature requests, or anything not covered by the help docs, reach out directly.</p>
+    <div class="highlight-box">cliff@cipherbrick.com</div>
+    <p>Please include: what you were trying to do, what happened, your browser or app version, and your operating system. This helps resolve issues faster.</p>
+    <p>Response time is typically within a few business days. CipherBrick Pro is a solo project — there is no support team, but every message is read and taken seriously.</p>
+    <a href="mailto:cliff@cipherbrick.com" class="btn-contact">Send Email →</a>
   </div>
 
   <div class="section">
-    <h2>Limitation of Liability</h2>
-    <p>To the fullest extent permitted by law, the developers of CipherBrick Pro shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of or inability to use the app, including any loss of data or breach of confidentiality.</p>
+    <h2>Report a Bug</h2>
+    <p>Bug reports are tracked publicly on GitHub. If you find something broken, opening an issue there is the fastest path to a fix.</p>
+    <a href="https://github.com/Cliff3c/Cipherbrick-Pro/issues" target="_blank" rel="noopener" class="btn-contact">Open a GitHub Issue →</a>
+    <p style="margin-top:1rem;">If you prefer not to use GitHub, email works too.</p>
   </div>
 
   <div class="section">
-    <h2>Open Source License</h2>
-    <p>The source code for CipherBrick Pro is released under the <strong style="color:var(--text)">MIT License</strong>. The MIT License governs your rights to use, copy, modify, and distribute the source code. These Terms of Use govern your use of the distributed application.</p>
-    <p>The full license text is available in the project repository at <a class="contact-link" href="https://github.com/Cliff3c/Cipherbrick-Pro" target="_blank" rel="noopener">github.com/Cliff3c/Cipherbrick-Pro</a>.</p>
+    <h2>Security Reports</h2>
+    <p>If you believe you have found a security vulnerability, please do not open a public GitHub issue. Report it privately by email so it can be assessed and addressed before public disclosure.</p>
+    <div class="warning-box">
+      Security reports: cliff@cipherbrick.com<br>
+      Please include a description of the issue and steps to reproduce.
+    </div>
+    <p>Responsible disclosure is appreciated. There is no formal bug bounty program, but all genuine security reports are taken seriously and acknowledged.</p>
   </div>
 
   <div class="section">
-    <h2>Changes to These Terms</h2>
-    <p>These terms may be updated from time to time. The effective date above will reflect the most recent revision. Continued use of the app after changes are posted constitutes acceptance of the updated terms.</p>
+    <h2>Google Play — Refunds &amp; Purchases</h2>
+    <p>The Android app is available as a one-time paid purchase on Google Play. Google handles all payment processing and refunds.</p>
+    <ul>
+      <li>Refunds within 48 hours of purchase can be requested directly through Google Play</li>
+      <li>For refund issues outside that window, contact Google Play support</li>
+      <li>If you have a question about app functionality before purchasing, the full-featured PWA is available free at <a class="contact-link" href="https://app.cipherbrick.com" target="_blank" rel="noopener">app.cipherbrick.com</a></li>
+    </ul>
+    <p>The Play Store purchase funds hosting, domain costs, and continued development. It does not unlock additional features — the app is identical to the free PWA.</p>
   </div>
 
   <div class="section">
-    <h2>Contact</h2>
-    <p>Questions regarding these terms can be directed to the project repository at <a class="contact-link" href="https://github.com/Cliff3c/Cipherbrick-Pro" target="_blank" rel="noopener">github.com/Cliff3c/Cipherbrick-Pro</a>.</p>
+    <h2>Privacy &amp; Data</h2>
+    <p>CipherBrick Pro has no accounts, no servers, and no data collection. If you have a privacy question, the answer is almost certainly covered in the <a class="contact-link" href="privacy.html">Privacy Policy</a>. The short version:</p>
+    <div class="highlight-box">
+      Your keys, messages, and encrypted output never leave your device.<br>
+      There is nothing stored on our end — because there is no "our end."
+    </div>
   </div>
 
 </div>
 
 <footer>
-  <p class="f-copy">© 2026 CipherBrick Pro &nbsp;·&nbsp; <a href="privacy.html" style="color:var(--text-dim);text-decoration:none;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Privacy Policy</a> &nbsp;·&nbsp; <a href="support.html" style="color:var(--text-dim);text-decoration:none;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Support</a></p>
+  <p class="f-copy">© 2026 CipherBrick Pro &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="terms.html">Terms of Use</a> &nbsp;·&nbsp; <a href="support.html">Support</a></p>
   <div class="trust-row">
     <span class="tc">MIT Licensed</span>
     <span class="tc">No Ads</span>
